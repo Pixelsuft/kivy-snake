@@ -28,6 +28,7 @@ class SnakeWidget(Widget):
     menu_color_count=50
     over_fps=fps
     over_score=score
+    last_arrow='right'
     
     
     def set_speed(self, vared):
@@ -110,6 +111,7 @@ class SnakeWidget(Widget):
                 label3_size=list(label3.size)
                 Rectangle(texture=label3.texture, size=label3_size, pos=((self.width/2)-(label3_size[0]/2), (self.height/2)-90+39))
             elif self.position=='game':
+                self.snake_vector=self.last_arrow
                 self.canvas.clear()
                 Color(0, 1, 0, 1)
                 lab_score = CoreLabel(text="Score: "+str(self.score), font_size=25, color=(0, 1, 0, 1))
@@ -183,6 +185,7 @@ class SnakeWidget(Widget):
             self.apple=[random_int(0, int(self.w/self.grid)-1), random_int(0, int(self.h/self.grid)-1)]
             self.score=0
             self.snake_vector='right'
+            self.last_arrow='right'
             self.fps=self.default_fps
             self.position='game'
             Clock.schedule_interval(self.main_loop, 1/self.fps)
@@ -192,16 +195,16 @@ class SnakeWidget(Widget):
             aws = 1 - ws
             if ws > hs and aws > hs:
                 if not self.snake_vector=='up':
-                    self.snake_vector = 'down'
+                    self.last_arrow = 'down'
             elif ws > hs >= aws:
                 if not self.snake_vector=='left':
-                    self.snake_vector = 'right'
+                    self.last_arrow = 'right'
             elif ws <= hs < aws:
                 if not self.snake_vector=='right':
-                    self.snake_vector = 'left'
+                    self.last_arrow = 'left'
             else:
                 if not self.snake_vector=='down':
-                    self.snake_vector = 'up'
+                    self.last_arrow = 'up'
                 
 
 class SnakeApp(App):
