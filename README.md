@@ -4,4 +4,4 @@ Snake On Python Kivy<br />
 # Downloads
 [Source Code (.ZIP)](https://github.com/Pixelsuft/kivy-snake/archive/%E2%80%AE.zip)<br />
 [Source Code (.TAR.GZ)](https://github.com/Pixelsuft/kivy-snake/archive/%E2%80%AE.tar.gz)<br />
-[Android Support Will Be Added! (.APK)](#)
+[Android (.APK)](https://github.com/Pixelsuft/kivy-snake/releases/download/%E2%80%AE/pixelsuftsnake-0.1-armeabi-v7a-debug.apk)
