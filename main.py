@@ -4,10 +4,12 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.core.text import Label as CoreLabel
 from kivy.graphics import (Color, Ellipse, Rectangle, Line)
+from kivy.core.audio import SoundLoader
 from time import sleep as time_sleep
 from random import randint as random_int
 from os import access as file_exists
 from os import F_OK as file_exists_param
+from os import getcwd as cur_dir
 
 
 class SnakeWidget(Widget):
@@ -29,6 +31,8 @@ class SnakeWidget(Widget):
     over_fps=fps
     over_score=score
     last_arrow='right'
+    menu_sound = SoundLoader.load(f'{cur_dir()}/menu.wav')
+    new_move_type = False
     
     
     def set_speed(self, vared):
@@ -51,6 +55,7 @@ class SnakeWidget(Widget):
             temp_f.write(txt_cfg)
             temp_f.close()
         self.load_config(txt_cfg)
+        self.menu_sound.play()
         Clock.schedule_interval(self.main_loop, 1/self.fps)    
     
     
@@ -102,11 +107,11 @@ class SnakeWidget(Widget):
                 label1.refresh()
                 label1_size=list(label1.size)
                 Rectangle(texture=label1.texture, size=label1_size, pos=((self.width/2)-(label1_size[0]/2), (self.height/2)-30+39))
-                label2 = CoreLabel(text="Speed: "+str(self.over_score), font_size=25, color=(0, 1, 0, 1))
+                label2 = CoreLabel(text="Score: "+str(self.over_score), font_size=25, color=(0, 1, 0, 1))
                 label2.refresh()
                 label2_size=list(label2.size)
                 Rectangle(texture=label2.texture, size=label2_size, pos=((self.width/2)-(label2_size[0]/2), (self.height/2)-60+39))
-                label3 = CoreLabel(text="Score: "+str(self.over_fps), font_size=25, color=(0, 1, 0, 1))
+                label3 = CoreLabel(text="Speed: "+str(self.over_fps), font_size=25, color=(0, 1, 0, 1))
                 label3.refresh()
                 label3_size=list(label3.size)
                 Rectangle(texture=label3.texture, size=label3_size, pos=((self.width/2)-(label3_size[0]/2), (self.height/2)-90+39))
@@ -176,6 +181,7 @@ class SnakeWidget(Widget):
     def on_touch_down(self, touch):
         if self.position=='menu' or self.position=='game_over':
             Clock.unschedule(self.main_loop)
+            self.menu_sound.stop()
             self.score=0
             self.position='menu'
             self.w, self.h=Window.size
@@ -188,23 +194,41 @@ class SnakeWidget(Widget):
             self.last_arrow='right'
             self.fps=self.default_fps
             self.position='game'
+            if touch.x < self.size[0] / 2:
+                self.new_move_type = True
+            else:
+                self.new_move_type = False
             Clock.schedule_interval(self.main_loop, 1/self.fps)
         elif self.position=='game':
-            ws = touch.x / self.size[0]
-            hs = touch.y / self.size[1]
-            aws = 1 - ws
-            if ws > hs and aws > hs:
-                if not self.snake_vector=='up':
-                    self.last_arrow = 'down'
-            elif ws > hs >= aws:
-                if not self.snake_vector=='left':
-                    self.last_arrow = 'right'
-            elif ws <= hs < aws:
-                if not self.snake_vector=='right':
-                    self.last_arrow = 'left'
+            if self.new_move_type:
+                ws = touch.x / self.size[0]
+                hs = touch.y / self.size[1]
+                aws = 1 - ws
+                if ws > hs and aws > hs:
+                    if not self.snake_vector=='up':
+                        self.last_arrow = 'down'
+                elif ws > hs >= aws:
+                    if not self.snake_vector=='left':
+                        self.last_arrow = 'right'
+                elif ws <= hs < aws:
+                    if not self.snake_vector=='right':
+                        self.last_arrow = 'left'
+                else:
+                    if not self.snake_vector=='down':
+                        self.last_arrow = 'up'
             else:
-                if not self.snake_vector=='down':
-                    self.last_arrow = 'up'
+                if touch.x < self.size[0] / 4:
+                    if not self.snake_vector=='right':
+                        self.last_arrow = 'left'
+                elif touch.x < self.size[0] / 2:
+                    if not self.snake_vector=='left':
+                        self.last_arrow = 'right'
+                elif touch.y < self.size[1] / 2:
+                    if not self.snake_vector=='up':
+                        self.last_arrow = 'down'
+                else:
+                    if not self.snake_vector=='down':
+                        self.last_arrow = 'up'
                 
 
 class SnakeApp(App):
